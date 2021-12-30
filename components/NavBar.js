@@ -1,3 +1,4 @@
+import { signIn, signOut, useSession } from 'next-auth/client';
 import {
     Box,
     Flex,
@@ -22,6 +23,7 @@ import {
     ChevronDownIcon,
     ChevronRightIcon,
   } from '@chakra-ui/icons';
+  import NextLink from 'next/link'
   
   export default function WithSubnavigation() {
     const { isOpen, onToggle } = useDisclosure();
@@ -70,14 +72,18 @@ import {
             justify={'flex-end'}
             direction={'row'}
             spacing={6}>
-            <Button
-              as={'a'}
-              fontSize={'sm'}
-              fontWeight={400}
-              variant={'link'}
-              href={'#'}>
-              Log Out
-            </Button>
+            <NextLink href='/auth' passHref>
+              <Button
+                as={'a'}
+                fontSize={'sm'}
+                fontWeight={400}
+                variant={'link'}
+                href={'#'}
+                onClick={() => signOut()}>
+                Log Out
+              </Button>
+            </NextLink>
+            
           </Stack>
         </Flex>
   
@@ -240,7 +246,7 @@ import {
         {
           label: 'Explore Design Work',
           subLabel: 'Trending Design to inspire you',
-          href: '#',
+          href: '/something',
         },
         {
           label: 'New & Noteworthy',

@@ -1,9 +1,10 @@
 import { extendTheme } from '@chakra-ui/react'
 
 const theme = extendTheme({
-    // fonts: {
-    //     heading: 'Bebas Neue',
-    // },
+    fonts: {
+        heading: 'Francois One',
+        body: 'Oxygen'
+    },
 })
 
 export default theme

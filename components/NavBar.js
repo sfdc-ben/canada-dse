@@ -24,6 +24,7 @@ import {
     ChevronRightIcon,
   } from '@chakra-ui/icons';
   import NextLink from 'next/link'
+  import { logoutRequest } from '../services/auth';
   
   export default function WithSubnavigation() {
     const { isOpen, onToggle } = useDisclosure();
@@ -79,7 +80,7 @@ import {
                 fontWeight={400}
                 variant={'link'}
                 href={'#'}
-                onClick={() => signOut()}>
+                onClick={logoutRequest}>
                 Log Out
               </Button>
             </NextLink>
@@ -240,6 +241,10 @@ import {
 
   
   const NAV_ITEMS = [
+    {
+      label: 'Home',
+      href: '/',
+    },
     {
       label: 'Inspiration',
       children: [

@@ -2,6 +2,8 @@ import { ChakraProvider } from '@chakra-ui/react'
 import theme from '../styles/theme'
 import "@fontsource/actor"
 import "@fontsource/bebas-neue"
+import "@fontsource/francois-one"
+import "@fontsource/oxygen"
 
 function MyApp({ Component, pageProps }) {
   return (

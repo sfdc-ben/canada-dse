@@ -1,5 +1,5 @@
 import { useState } from 'react';
-
+import { useRouter } from 'next/router'
 import {
     Box,
     Flex,
@@ -18,16 +18,31 @@ import {
     IconProps,
     Icon,
     Fade,
-    useDisclosure
+    useDisclosure,
+    useToast,
+    HStack,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    ModalCloseButton
 } from '@chakra-ui/react';
+import { sendLoginRequest, checkDomain, checkPassword, sendRegisterRequest } from '../services/auth';
 
 export default function JoinOurTeam() {
+    const router = useRouter()
+    
     // Handle State
 
     const [authType, setType] = useState('Login');
 
     const [show, setShow] = useState(false)
     const handleShow = () => setShow(!show)
+
+    const [resetShow, setResetShow] = useState(false)
+    const handleResetShow = () => setResetShow(!resetShow)
 
     const [username, setUsername] = useState('')
     const handleUsernameInput = (event) => setUsername(event.target.value)
@@ -44,10 +59,24 @@ export default function JoinOurTeam() {
         setMatch(password === event.target.value)
     }
 
+    const [resetPassword, setResetPassword] = useState('')
+    const handleResetPasswordInput = (event) => {
+        setResetPassword(event.target.value)
+        setResetMatch(event.target.value === confirmResetPassword)
+    }
+
+    const [confirmResetPassword, setConfirmResetPassword] = useState('')
+    const handleConfirmResetPasswordInput = (event) => {
+        setConfirmResetPassword(event.target.value)
+        setResetMatch(resetPassword === event.target.value)
+    }
+
     const [match, setMatch] = useState(false)
+    const [resetMatch, setResetMatch] = useState(false)
     
     // Handle Discolsure
     const { isOpen, onToggle } = useDisclosure()
+    const modal = useDisclosure()
 
     // Interaction Handlers
     const handleLoginType = (event) => {
@@ -57,6 +86,86 @@ export default function JoinOurTeam() {
     const handleJoinType = (event) => {
         setType('Join')
         onToggle()
+    }
+
+    const toast = useToast()
+    const fireToast = ( resObj ) => {
+        toast({
+            title: resObj.title,
+            description: resObj.message,
+            status: resObj.status,
+            duration: 9000,
+            isClosable: true,
+          })
+    }
+
+    const login = async () => {
+        if (!checkDomain(username)) {
+            fireToast({
+                title: 'Login',
+                status: 'error',
+                message: 'Invalid email domain. Please make sure you are using a valid Salesforce or customer domain'
+            })
+            return
+        }
+        await sendLoginRequest(username, password)
+        .then((data) => {
+            console.log(data)
+            router.push('/')
+        })
+        .catch((error) => {
+            console.log(error)
+            fireToast({
+                title: 'Login Request',
+                status: 'error',
+                message: 'Invalid login credentials. Please try again or register for an account.'
+            })
+        })
+    }
+
+    const reset = async () => {
+        console.log('Yay Reset')
+    }
+
+    const register = async () => {
+        if (!checkDomain(username)) {
+            fireToast({
+                title: 'Registration',
+                status: 'error',
+                message: 'Invalid email domain. Please make sure you are using a valid Salesforce or customer domain'
+            })
+            return
+        }
+        const check = checkPassword(password, confirmPassword)
+        if (check.pass) {
+            console.log(username, password, confirmPassword)
+            await sendRegisterRequest(username, password, confirmPassword)
+            .then((response) => {
+                fireToast({
+                    title: 'Registration',
+                    status: 'success',
+                    message: 'Account Created! Please check your email to verify your account'
+                })
+                setUsername('')
+                setPassword('')
+                setConfirmPassword('')
+            })
+            .catch(error => {
+                console.log(error)
+                fireToast({
+                    title: 'Registration',
+                    status: 'error',
+                    message: 'An account may already exist for this email. Try resetting your password.'
+                })
+            })
+        } else {
+            fireToast({
+                title: 'Registration',
+                status: 'error',
+                message: check.error
+            })
+        }
+        
     }
 
 
@@ -113,7 +222,7 @@ export default function JoinOurTeam() {
                             <Box as={'form'} mt={10}>
                                 <Stack spacing={4}>
                                 <Input
-                                        placeholder="Username"
+                                        placeholder="Email"
                                         bg={'gray.100'}
                                         border={0}
                                         color={'gray.500'}
@@ -152,7 +261,7 @@ export default function JoinOurTeam() {
                                     <InputGroup size='md'>
                                         <Input
                                             pr='4.5rem'
-                                            type={show ? 'text' : 'password'}
+                                            type={'password'}
                                             placeholder='Confirm password'
                                             bg={'gray.100'}
                                             border={0}
@@ -192,13 +301,14 @@ export default function JoinOurTeam() {
                                     }}
                                     _focus={{
                                         boxShadow: 'none'
-                                    }}>
+                                    }}
+                                    onClick={register}>
                                     Register
                                 </Button>
                                 <Button
                                     fontFamily={'heading'}
                                     mt={4}
-                                    size={'xs'}
+                                    size={'sm'}
                                     w={'full'}
                                     bgGradient="linear(to-r, red.400,pink.400)"
                                     bgClip="text"
@@ -248,7 +358,7 @@ export default function JoinOurTeam() {
                             <Box as={'form'} mt={10}>
                                 <Stack spacing={4}>
                                     <Input
-                                        placeholder="Username"
+                                        placeholder="Email"
                                         bg={'gray.100'}
                                         border={0}
                                         color={'gray.500'}
@@ -301,35 +411,153 @@ export default function JoinOurTeam() {
                                     }}
                                     _focus={{
                                         boxShadow: 'none'
-                                    }}>
+                                    }}
+                                    onClick={login}>
                                     Login
                                 </Button>
-                                <Button
-                                    fontFamily={'heading'}
-                                    mt={4}
-                                    size={'xs'}
-                                    w={'full'}
-                                    bgGradient="linear(to-r, red.400,pink.400)"
-                                    bgClip="text"
-                                    onClick={handleJoinType}
-                                    _hover={{
-                                        bgGradient: 'linear(to-r, red.500,pink.500)'
-                                    }}
-                                    _active={{
-                                        bgGradient: 'linear(to-r, red.500,pink.500)'
-                                    }}
-                                    _focus={{
-                                        boxShadow: 'none'
-                                    }}>
-                                    Register For Access
-                                </Button>
+                                <HStack mt={'4'} align={'center'}>
+                                    <Button
+                                        fontFamily={'heading'}
+                                        size={'sm'}
+                                        w={'full'}
+                                        bgGradient="linear(to-r, red.400,pink.400)"
+                                        bgClip="text"
+                                        onClick={handleJoinType}
+                                        _hover={{
+                                            bgGradient: 'linear(to-r, red.500,pink.500)'
+                                        }}
+                                        _active={{
+                                            bgGradient: 'linear(to-r, red.500,pink.500)'
+                                        }}
+                                        _focus={{
+                                            boxShadow: 'none'
+                                        }}>
+                                        Register For Access
+                                    </Button>
+                                    <Button
+                                        fontFamily={'heading'}
+                                        size={'sm'}
+                                        w={'full'}
+                                        bgGradient="linear(to-r, red.400,pink.400)"
+                                        bgClip="text"
+                                        onClick={modal.onOpen}
+                                        _hover={{
+                                            bgGradient: 'linear(to-r, red.500,pink.500)'
+                                        }}
+                                        _active={{
+                                            bgGradient: 'linear(to-r, red.500,pink.500)'
+                                        }}
+                                        _focus={{
+                                            boxShadow: 'none'
+                                        }}>
+                                        Reset Password
+                                    </Button>
+                                </HStack>
                             </Box>
                         </Stack>
                     </Fade>
                     
                 ) : null}
 
-{/* else */}
+                <Modal isOpen={modal.isOpen} onClose={modal.onClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>Send Password Reset</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
+                            <Box as={'form'}>
+                                <Stack spacing={4}>
+                                    <Input
+                                        placeholder="Email"
+                                        bg={'gray.100'}
+                                        border={0}
+                                        color={'gray.500'}
+                                        _placeholder={{
+                                            color: 'gray.500',
+                                        }}
+                                        onChange={handleUsernameInput}
+                                        value={username}
+                                    />
+                                    <InputGroup size='md'>
+                                        <Input
+                                            pr='4.5rem'
+                                            type={resetShow ? 'text' : 'password'}
+                                            placeholder='Enter password'
+                                            bg={'gray.100'}
+                                            border={0}
+                                            color={'gray.500'}
+                                            _placeholder={{
+                                                color: 'gray.500',
+                                            }}
+                                            onChange={handleResetPasswordInput}
+                                            value={resetPassword}
+                                        />
+                                        <InputRightElement width='4.5rem'>
+                                            <Button
+                                                h='1.75rem'
+                                                size='sm'
+                                                onClick={handleResetShow}
+                                                _focus={{
+                                                    boxShadow: 'none'
+                                                }}>
+                                            {resetShow ? 'Hide' : 'Show'}
+                                            </Button>
+                                        </InputRightElement>
+                                    </InputGroup>
+                                    <InputGroup size='md'>
+                                        <Input
+                                            pr='4.5rem'
+                                            type={'password'}
+                                            placeholder='Confirm password'
+                                            bg={'gray.100'}
+                                            border={0}
+                                            color={'gray.500'}
+                                            _placeholder={{
+                                                color: 'gray.500',
+                                            }}
+                                            onChange={handleConfirmResetPasswordInput}
+                                            value={confirmResetPassword}
+                                        />
+                                        <InputRightElement width='4.5rem'>
+                                            <Button
+                                                h='1.75rem'
+                                                size='sm'
+                                                variant='ghost'
+                                                colorScheme={resetMatch ? 'green' : 'red'}
+                                                _focus={{
+                                                    boxShadow: 'none'
+                                                }}>
+                                            {resetMatch ? 'Match' : 'X'}
+                                            </Button>
+                                        </InputRightElement>
+                                    </InputGroup>
+                                </Stack>
+                            </Box>
+                        </ModalBody>
+
+                        <ModalFooter>
+                            <Button
+                                fontFamily={'heading'}
+                                mt={2}
+                                w={'full'}
+                                bgGradient="linear(to-r, red.400,pink.400)"
+                                color={'white'}
+                                _hover={{
+                                    bgGradient: 'linear(to-r, red.400,pink.400)',
+                                    boxShadow: 'xl',
+                                }}
+                                _active={{
+                                    bgGradient: 'linear(to-r, red.500,pink.500)'
+                                }}
+                                _focus={{
+                                    boxShadow: 'none'   
+                                }}
+                                onClick={reset}>
+                                Reset Password
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
 
             </Container>
             <Blur

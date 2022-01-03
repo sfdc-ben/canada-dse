@@ -30,9 +30,6 @@ const Home = () => {
                 <Box height="100%" overflow="scroll">
                     <Hero></Hero>
                     <CTA></CTA>
-                    {/* <Flex height="100vh" direction="column" background="gray.500" p={16} rounded={10}>
-                        <Heading color="blue.300">Hello there!</Heading>
-                    </Flex> */}
                 </Box>
                 <Footer></Footer>
             </div>

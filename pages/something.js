@@ -90,12 +90,15 @@ const TestimonialAvatar = ({
 export default function WithSpeechBubbles() {
     const { user, loading } = useUser()
     const router = useRouter()
+
+    const mode = useColorModeValue('gray.100', 'gray.700')
   
     useEffect(() => {
       if (!(user || loading)) {
         router.push('/auth')
       }
     })
+
     
     return (
         <>
@@ -106,7 +109,7 @@ export default function WithSpeechBubbles() {
         {user ? (
             <div>
                 <NavBar></NavBar>
-                <Box bg={useColorModeValue('gray.100', 'gray.700')}>
+                <Box bg={mode}>
                     <Container maxW={'7xl'} py={16} as={Stack} spacing={12}>
                         <Stack spacing={0} align={'center'}>
                             <Heading>Our Clients Speak</Heading>

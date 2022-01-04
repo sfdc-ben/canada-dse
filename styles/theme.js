@@ -2,8 +2,8 @@ import { extendTheme } from '@chakra-ui/react'
 
 const theme = extendTheme({
     fonts: {
-        heading: 'Francois One',
-        body: 'Oxygen'
+        heading: 'Trailhead Bold',
+        body: 'Salesforce Regular'
     },
 })
 

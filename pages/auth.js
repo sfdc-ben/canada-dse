@@ -29,7 +29,7 @@ import {
     ModalBody,
     ModalCloseButton
 } from '@chakra-ui/react';
-import { sendLoginRequest, checkDomain, checkPassword, sendRegisterRequest } from '../services/auth';
+import { sendLoginRequest, checkDomain, checkPassword, sendRegisterRequest, sendResetRequest } from '../services/auth';
 
 export default function JoinOurTeam() {
     const router = useRouter()
@@ -110,7 +110,6 @@ export default function JoinOurTeam() {
         }
         await sendLoginRequest(username, password)
         .then((data) => {
-            console.log(data)
             router.push('/')
         })
         .catch((error) => {
@@ -124,7 +123,36 @@ export default function JoinOurTeam() {
     }
 
     const reset = async () => {
-        console.log('Yay Reset')
+        const check = checkPassword(resetPassword, confirmResetPassword)
+        if (check.pass) {
+            console.log(username, resetPassword, confirmResetPassword)
+            await sendResetRequest(username, resetPassword, confirmResetPassword)
+            .then((response) => {
+                fireToast({
+                    title: 'Reset Password',
+                    status: 'success',
+                    message: 'Email Sent. Please check your email and click the link to finalize the password reset.'
+                })
+                setConfirmResetPassword('')
+                setResetPassword('')
+                setUsername('')
+                modal.onClose()
+            })
+            .catch(error => {
+                console.log(error)
+                fireToast({
+                    title: 'Reset Password',
+                    status: 'error',
+                    message: 'An account may not exist for this email. Try registering for an account.'
+                })
+            })
+        } else {
+            fireToast({
+                title: 'Reset Password',
+                status: 'error',
+                message: check.error
+            })
+        }
     }
 
     const register = async () => {
@@ -149,6 +177,7 @@ export default function JoinOurTeam() {
                 setUsername('')
                 setPassword('')
                 setConfirmPassword('')
+
             })
             .catch(error => {
                 console.log(error)

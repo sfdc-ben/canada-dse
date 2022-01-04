@@ -183,7 +183,6 @@ export default function WithSpeechBubbles() {
                                 </iframe>
                             </AspectRatio>
                         </Box>
-                        
                     </Container>
                 </Box>
             </div>

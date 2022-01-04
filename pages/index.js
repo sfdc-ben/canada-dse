@@ -27,11 +27,12 @@ const Home = () => {
         {user ? (
             <div>
                 <NavBar></NavBar>
-                <Box height="100%" overflow="scroll">
+                <Box position={'relative'} top={'70px'} height="100%" overflow="scroll">
                     <Hero></Hero>
                     <CTA></CTA>
+                    <Footer></Footer>
                 </Box>
-                <Footer></Footer>
+                
             </div>
             ) : (
                 <div>

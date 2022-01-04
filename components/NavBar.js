@@ -31,14 +31,15 @@ import {
   
     return (
       <Box
-      position={'sticky'}
-      top={0}
-      zIndex={'2000'}
       >
         <Flex
           bg={useColorModeValue('white', 'gray.800')}
           color={useColorModeValue('gray.600', 'white')}
           minH={'10vh'}
+          position={'fixed'}
+          width={'100vw'}
+          top={0}
+          zIndex={'2000'}
           py={{ base: 2 }}
           px={{ base: 4, md: 12 }}
           borderBottom={1}
@@ -88,7 +89,7 @@ import {
           </Stack>
         </Flex>
   
-        <Collapse in={isOpen} animateOpacity>
+        <Collapse  in={isOpen} animateOpacity style={{ zIndex: '1000' }}>
           <MobileNav />
         </Collapse>
       </Box>
@@ -108,7 +109,7 @@ import {
               <PopoverTrigger>
                 <Link
                   p={2}
-                  href={navItem.href ?? '#'}
+                  href={navItem.href ?? 'javascript:;'}
                   fontSize={'sm'}
                   fontWeight={500}
                   color={linkColor}
@@ -181,6 +182,10 @@ import {
       <Stack
         bg={useColorModeValue('white', 'gray.800')}
         p={4}
+        position={'fixed'}
+        top={'70px'}
+        width={'100%'}
+        zIndex={'1000'}
         display={{ md: 'none' }}>
         {NAV_ITEMS.map((navItem) => (
           <MobileNavItem key={navItem.label} {...navItem} />
@@ -197,7 +202,7 @@ import {
         <Flex
           py={2}
           as={Link}
-          href={href ?? '#'}
+          href={href ?? 'javascript:;'}
           justify={'space-between'}
           align={'center'}
           _hover={{
@@ -219,7 +224,7 @@ import {
           )}
         </Flex>
   
-        <Collapse in={isOpen} animateOpacity style={{ marginTop: '0!important' }}>
+        <Collapse  in={isOpen} animateOpacity style={{ marginTop: '0!important' }}>
           <Stack
             mt={2}
             pl={4}

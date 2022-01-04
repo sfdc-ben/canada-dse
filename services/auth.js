@@ -74,12 +74,12 @@ const sendLoginRequest = async (username, password) => {
         url: window.location.hostname
     })
     .then((response) => {
-        console.log(response)
-        var in5Minutes = 1/288
+        console.log('Successful Login')
+        // var in5Minutes = 1/288
         Cookies.set("accessToken", response.data.accessToken, { expires: 7 });
-        res.status = 'success'
-        console.log(res)
-        return res
+        // res.status = 'success'
+        // console.log(res)
+        // return res
     })
     .catch((error) => {
         console.log(error)
@@ -98,7 +98,7 @@ const sendRegisterRequest = async (username, password, confirmPassword) => {
         returnUrl : window.location.href
     })
     .then((response) => {
-        console.log('Yay Ran', response)
+        console.log('Successful Registration')
 
     })
     .catch (error => {
@@ -107,8 +107,21 @@ const sendRegisterRequest = async (username, password, confirmPassword) => {
     })
 }
 
-const sendRestRequest = async (username, password, confirmPassword) => {
+const sendResetRequest = async (username, password, confirmPassword) => {
+    await axios.post("https://cx-shield.herokuapp.com/api/user/reset",{
+        username,
+        password,
+        confirmPassword,
+        returnUrl : window.location.href
+    })
+    .then((response) => {
+        console.log('Successful Reset Request')
 
+    })
+    .catch (error => {
+        console.log(error)
+        throw new Error
+    })
 }
 
-export { sendLoginRequest, sendRegisterRequest, useUser, logoutRequest, checkDomain, checkPassword }
+export { sendLoginRequest, sendRegisterRequest, sendResetRequest, useUser, logoutRequest, checkDomain, checkPassword }
